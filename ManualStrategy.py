@@ -70,28 +70,6 @@ class ManualStrategy:
             t1 = time.time()
             elapsed_time = t1-t0
             print("Elapsed Time = ", elapsed_time)
-        # df_prices_adj.index = df_prices.index[0]
-        # s_date_minus1 = df_prices_adj.index[df_prices_adj.index.index(
-        #     s_date) - 1]
-        # s_date = df_prices.index[0]
-
-        # # for i in df_prices_adj.index:
-        # #     if i==
-        # temp = np.where(df_prices_adj.index ==
-        #                 np.datetime64(s_date))[0][0] - 1
-        # s_date_minus1 = df_prices_adj.index[temp]
-        # macd_signal = macd_signal.loc[s_date:]
-        # macd = macd.loc[s_date:]
-        # bb_value = bb_value.loc[s_date:]
-        # rsi = rsi.loc[s_date_minus1:]
-        # momentum = momentum.loc[s_date:]
-        # sma = sma.loc[s_date:]
-
-        # print(sma)
-        # print(momentum)
-        # print(rsi)
-        # print(macd)
-        # print(df_p)
             holding = 1000
             order = [0 for i in range(df_prices.shape[0])]
             order[0] = 1000

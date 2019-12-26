@@ -89,7 +89,9 @@ def technicalIndicators(df_prices):
     # plt.close()
     # RSI
     n = 14
-    daily_rets = np.diff(df_price)
+    rsi = df_price.copy()
+    rsi.ix[:,:] = 0
+    daily_rets = df_price - df_price.shift(1)
     up_rets = daily_rets[daily_rets >= 0].fillna(0).cumsum()
     down_rets = -1 * daily_rets[daily_rets < 0].fillna(0).cumsum()
 
@@ -105,7 +107,7 @@ def technicalIndicators(df_prices):
     for day in range(df_price.shape[0]):
         up = up_gain.ix[day, :]
         down = down_loss.ix[day, :]
-        rs = (up/n)/)(down/n)
+        rs = up/down
         rsi.ix[day, :]=100 - (100/(1 + rs))
     rsi[rsi == np.inf]=100
 
