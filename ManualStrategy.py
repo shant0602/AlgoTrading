@@ -70,16 +70,42 @@ class ManualStrategy:
             t1 = time.time()
             elapsed_time = t1-t0
             print("Elapsed Time = ", elapsed_time)
+<<<<<<< HEAD
+=======
+        # df_prices_adj.index = df_prices.index[0]
+        # s_date_minus1 = df_prices_adj.index[df_prices_adj.index.index(
+        #     s_date) - 1]
+        # s_date = df_prices.index[0]
+
+        # # for i in df_prices_adj.index:
+        # #     if i==
+        # temp = np.where(df_prices_adj.index ==
+        #                 np.datetime64(s_date))[0][0] - 1
+        # s_date_minus1 = df_prices_adj.index[temp]
+        # macd_signal = macd_signal.loc[s_date:]
+        # macd = macd.loc[s_date:]
+        # bb_value = bb_value.loc[s_date:]
+        # rsi = rsi.loc[s_date_minus1:]
+        # momentum = momentum.loc[s_date:]
+        # sma = sma.loc[s_date:]
+
+        # print(sma)
+        # print(momentum)
+        # print(rsi)
+        # print(macd)
+        # print(df_p)
+            current_time = df_prices_adj.index[-1]
+            prev_time = df_prices_adj.index[-2]
+>>>>>>> b4d658c90b4d76e0d0e6508e8236353037a6deba
             holding = 1000
             order = [0 for i in range(df_prices.shape[0])]
             order[0] = 1000
             if count == 1:
-                trade_orders = pd.DataFrame(
-                    index=df_prices.index[-1], columns=[symbol])
-            trade_orders.fillna(0, inplace=True)
-            for i in range(1, df_prices.shape[0]):
-                if bb_value.iloc[i-1] <= -1 and bb_value.iloc[i] > -1:
-                    if rsi.iloc[i-1] <= 30 and rsi.iloc[i] > 30:
+                trade_orders = pd.DataFrame(columns=symbols)
+            # trade_orders.fillna(0, inplace=True)
+            for j in range(symbols.size()):
+                if bb_value.iloc[i-1, j] <= -1 and bb_value.iloc[i, j] > -1:
+                    if rsi.iloc[i-1, j] <= 30 and rsi.iloc[i, j] > 30:
                         if holding == 0 or holding == -1000:
                             order[i] = 1000
                             holding += 1000
