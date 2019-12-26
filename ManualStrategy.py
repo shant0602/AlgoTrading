@@ -92,17 +92,19 @@ class ManualStrategy:
         # print(rsi)
         # print(macd)
         # print(df_p)
+            current_time = df_prices_adj.index[-1]
+            prev_time = df_prices_adj.index[-2]
             holding = 1000
             order = [0 for i in range(df_prices.shape[0])]
             order[0] = 1000
             if count == 1:
-                trade_orders = pd.DataFrame(
-                    index=df_prices.index[-1], columns=[symbol])
-            trade_orders.fillna(0, inplace=True)
-            for i in range(1, df_prices.shape[0]):
-                if bb_value.iloc[i-1] <= -1 and bb_value.iloc[i] > -1:
-                    if rsi.iloc[i-1] <= 30 and rsi.iloc[i] > 30:
+                trade_orders = pd.DataFrame(columns=symbols)
+            # trade_orders.fillna(0, inplace=True)
+            for j in range(symbols.size()):
+                if bb_value.iloc[i-1, j] <= -1 and bb_value.iloc[i, j] > -1:
+                    if rsi.iloc[i-1, j] <= 30 and rsi.iloc[i, j] > 30:
                         if holding == 0 or holding == -1000:
+                            trade_orders.loc[current_time, symbols[j]]
                             order[i] = 1000
                             holding += 1000
                 # elif rsi.iloc[i-1] <= 30 and rsi.iloc[i] > 30:
