@@ -18,43 +18,22 @@ class ManualStrategy:
 
     def testPolicy(self, symbol="AAPL", sd=dt.datetime(2010, 1, 1), ed=dt.datetime(2011, 12, 31), sv=100000):
         window_ = 20
-
         lookback_window = 200
-        # extra_days = math.ceil(lookback_window/7)*2
-        # lookback_window += extra_days
-        # adjustedStartDay = sd - dt.timedelta(days=lookback_window)
-        # # example usage of the old backward compatible util function
-        # syms = [symbol]
-        # dates = pd.date_range(sd, ed)
-        # dates_adj = pd.date_range(adjustedStartDay, ed)
-        # prices_all = get_data(syms, dates)  # automatically adds SPY
-        # prices_all_adj = get_data(syms, dates_adj)  # automatically adds SPY
-        # prices_all.fillna('ffill', inplace=True)
-        # prices_all.fillna('bfill', inplace=True)
-        # prices_all_adj.fillna('ffill', inplace=True)
-        # prices_all_adj.fillna('bfill', inplace=True)
-        # df_prices = pd.DataFrame(prices_all[syms])  # only portfolio symbols
-        # # only SPY, for comparison later
-        # prices_SPY = pd.DataFrame(prices_all['SPY'])
-        # # only portfolio symbols
-
-        # df_prices_adj = pd.DataFrame(prices_all_adj[syms])
-        # # only SPY, for comparison later
-        # prices_SPY_adj = pd.DataFrame(prices_all_adj['SPY'])
     # Getting live stock data
-        symbols = ["IBM", "MSFT", "AAPL"]
-        isSymbolFirst = True
+        symbols = ["IBM", "MSFT", "AAPL","SPY"]
         api_key = 'D3YIZ9Q9T9COACJ4'
         ts = TimeSeries(key=api_key, output_format='pandas')
         count = 1
+        trade_orders = pd.DataFrame(columns=symbols)
         while(count > 0):
+            isSymbolFirst = True
             t0 = time.time()
             for sym in symbols:
                 data, meta_data = ts.get_intraday(
                     symbol=sym, interval='1min', outputsize='full')
                 data = data[['4. close']]
                 if isSymbolFirst:
-                    df_prices_adj = data
+                    df_prices_adj = data.copy()
                     isSymbolFirst = False
                 else:
                     df_prices_adj = pd.concat(
@@ -64,80 +43,37 @@ class ManualStrategy:
             print(df_prices_adj)
             # data.to_csv(('per minute data.csv'))
             # time.sleep(60)
-
-            macd, macd_signal, bb_value, rsi, momentum, sma = ind.technicalIndicators(
+            macd, macd_signal, bb_value, rsi, momentum, sma,sma_ratio = ind.technicalIndicators(
                 df_prices_adj)
+            current_time = df_prices_adj.index[-1]
+            prev_time = df_prices_adj.index[-2]
+            holding = 1000
+            # trade_orders.fillna(0, inplace=True)
+            for sym in symbols:
+                if (sma_ratio.loc[current_time,sym] < 0.95) and (bb_value.loc[current_time, sym] < 0)\
+                     and (rsi.loc[current_time,sym] < 30) and (rsi.loc[current_time,'SPY'] > 30):
+                        if holding < 100:
+                            trade_orders.loc[current_time, sym] = 100
+                            holding += 100
+                elif (sma_ratio.loc[current_time,sym] > 1.05) and (bb_value.loc[current_time, sym] > 1)\
+                     and (rsi.loc[current_time,sym] > 70) and (rsi.loc[current_time,'SPY'] < 70):
+                        if holding > -100:
+                            trade_orders.loc[current_time, sym] = -100
+                            holding += -100
+                elif (sma_ratio.loc[prev_time,sym] < 1 ) and (sma_ratio.loc[current_time,sym] >= 1) and (holding > 0):
+                    trade_orders.loc[current_time, sym] = -100
+                    holding += -100
+                elif (sma_ratio.loc[prev_time,sym] > 1 ) and (sma_ratio.loc[current_time,sym] <= 1) and (holding < 0):
+                    trade_orders.loc[current_time, sym] = 100
+                    holding += 100
+            count += 1
+            print(trade_orders)
+            time.sleep(57)
             t1 = time.time()
             elapsed_time = t1-t0
             print("Elapsed Time = ", elapsed_time)
-<<<<<<< HEAD
-=======
-        # df_prices_adj.index = df_prices.index[0]
-        # s_date_minus1 = df_prices_adj.index[df_prices_adj.index.index(
-        #     s_date) - 1]
-        # s_date = df_prices.index[0]
-
-        # # for i in df_prices_adj.index:
-        # #     if i==
-        # temp = np.where(df_prices_adj.index ==
-        #                 np.datetime64(s_date))[0][0] - 1
-        # s_date_minus1 = df_prices_adj.index[temp]
-        # macd_signal = macd_signal.loc[s_date:]
-        # macd = macd.loc[s_date:]
-        # bb_value = bb_value.loc[s_date:]
-        # rsi = rsi.loc[s_date_minus1:]
-        # momentum = momentum.loc[s_date:]
-        # sma = sma.loc[s_date:]
-
-        # print(sma)
-        # print(momentum)
-        # print(rsi)
-        # print(macd)
-        # print(df_p)
-            current_time = df_prices_adj.index[-1]
-            prev_time = df_prices_adj.index[-2]
->>>>>>> b4d658c90b4d76e0d0e6508e8236353037a6deba
-            holding = 1000
-            order = [0 for i in range(df_prices.shape[0])]
-            order[0] = 1000
-            if count == 1:
-                trade_orders = pd.DataFrame(columns=symbols)
-            # trade_orders.fillna(0, inplace=True)
-            for j in range(symbols.size()):
-                if bb_value.iloc[i-1, j] <= -1 and bb_value.iloc[i, j] > -1:
-                    if rsi.iloc[i-1, j] <= 30 and rsi.iloc[i, j] > 30:
-                        if holding == 0 or holding == -1000:
-                            order[i] = 1000
-                            holding += 1000
-                # elif rsi.iloc[i-1] <= 30 and rsi.iloc[i] > 30:
-                #     if holding == 0 or holding == -1000:
-                #         order.append(1000)
-                #         holding += 1000
-                #     else:
-                #         order.append(0)
-                elif momentum.iloc[i-1] <= 0 and momentum.iloc[i] > 0:
-                    if holding == 0 or holding == -1000:
-                        order[i] = 1000
-                        holding += 1000
-                elif bb_value.iloc[i-1] >= 1 and bb_value.iloc[i] < 1:
-                    if rsi.iloc[i-1] >= 70 and rsi.iloc[i] < 70:
-                        if holding == 1000 or holding == 0:
-                            order[i] = -1000
-                            holding -= 1000
-                # elif rsi.iloc[i-1] >= 70 and rsi.iloc[i] < 70:
-                #     if holding == 1000 or holding == 0:
-                #         order.append(-1000)
-                #         holding -= 1000
-                #     else:
-                #         order.append(0)
-                elif momentum.iloc[i-1] >= 0 and momentum.iloc[i] < 0:
-                    if holding == 1000 or holding == 0:
-                        order[i] = -1000
-                        holding -= 1000
-            trade_orders[symbol] = order
-            count += 1
-
-        # print(trade_orders)
+            # df_prices_adj.loc[:,:]=0
+        print(trade_orders)
         return trade_orders
 
 # author: Shantanu Singh

@@ -24,7 +24,7 @@ def technicalIndicators(df_prices):
     # print(rm_symbol)
     # print(rm_symbol)
     # print(df_price.loc[])
-    sma_ratio = df_price/rm_symbol - 1
+    sma_ratio = df_price/rm_symbol 
     # print("SMA_ratio", sma_ratio)
     # print("SMA_ratio mean", sma_ratio.mean())
 
@@ -90,7 +90,7 @@ def technicalIndicators(df_prices):
     # RSI
     n = 14
     rsi = df_price.copy()
-    rsi.ix[:,:] = 0
+    rsi.loc[:,:] = 0
     daily_rets = df_price - df_price.shift(1)
     up_rets = daily_rets[daily_rets >= 0].fillna(0).cumsum()
     down_rets = -1 * daily_rets[daily_rets < 0].fillna(0).cumsum()
@@ -105,10 +105,10 @@ def technicalIndicators(df_prices):
         down_rets.values[:-n, :]
 
     for day in range(df_price.shape[0]):
-        up = up_gain.ix[day, :]
-        down = down_loss.ix[day, :]
+        up = up_gain.iloc[day, :]
+        down = down_loss.iloc[day, :]
         rs = up/down
-        rsi.ix[day, :]=100 - (100/(1 + rs))
+        rsi.iloc[day, :]=100 - (100/(1 + rs))
     rsi[rsi == np.inf]=100
 
     # deltas = np.diff(df_price)
@@ -155,7 +155,7 @@ def technicalIndicators(df_prices):
     # df_indicators['BB'] = bb_value
     # df_indicators['RSI'] = df_rsi
     # print(bb_value)
-    return macd, macd_signal, bb_value, df_rsi, momentum, rm_symbol
+    return macd, macd_signal, bb_value, df_rsi, momentum, rm_symbol, sma_ratio
 
 
 def testCode():

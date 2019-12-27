@@ -21,9 +21,19 @@ df.loc['Day4', :] = [43,53]
 df.loc['Day5', :] = [44,54]
 df.loc['Day6', :] = [45,55]
 df.loc['Day7', :] = [46,56]
+df.columns = ['G','A']
 df2 = pd.DataFrame(index=df.index,columns=df.columns)
 # df2[(df < 55) & (df > 51)]=-1
-df2[(df == 43) | (df == 55)] += 0
-print(
-    df2 )
+df2[(df == 43) | (df == 55)] = 0
+# print(
+#     df2 )
 # print(df2.loc['Day4'])
+df3 = df.copy()
+print(df3)
+# df3.loc[:,:]=0
+# print(df3)
+df3 = df2.copy()
+
+print(df3)
+
+
