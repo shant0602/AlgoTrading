@@ -20,7 +20,7 @@ class ManualStrategy:
         window_ = 20
         lookback_window = 200
     # Getting live stock data
-        symbols = ["IBM", "MSFT", "AAPL","SPY"]
+        symbols = ["IBM", "MSFT", "AAPL", "SPY"]
         api_key = 'D3YIZ9Q9T9COACJ4'
         ts = TimeSeries(key=api_key, output_format='pandas')
         count = 1
@@ -30,7 +30,7 @@ class ManualStrategy:
             t0 = time.time()
             for sym in symbols:
                 data, meta_data = ts.get_intraday(
-                    symbol=sym, interval='1min', outputsize='full')
+                    symbol=sym, interval='1min', outputsize='compact')
                 data = data[['4. close']]
                 if isSymbolFirst:
                     df_prices_adj = data.copy()
@@ -39,31 +39,31 @@ class ManualStrategy:
                     df_prices_adj = pd.concat(
                         [df_prices_adj, data], axis=1)
             df_prices_adj.columns = symbols
-            df_prices_adj = df_prices_adj[-lookback_window:-1]
+            # df_prices_adj = df_prices_adj[-lookback_window:-1]
             print(df_prices_adj)
             # data.to_csv(('per minute data.csv'))
             # time.sleep(60)
-            macd, macd_signal, bb_value, rsi, momentum, sma,sma_ratio = ind.technicalIndicators(
+            macd, macd_signal, bb_value, rsi, momentum, sma, sma_ratio = ind.technicalIndicators(
                 df_prices_adj)
             current_time = df_prices_adj.index[-1]
             prev_time = df_prices_adj.index[-2]
             holding = 1000
             # trade_orders.fillna(0, inplace=True)
             for sym in symbols:
-                if (sma_ratio.loc[current_time,sym] < 0.95) and (bb_value.loc[current_time, sym] < 0)\
-                     and (rsi.loc[current_time,sym] < 30) and (rsi.loc[current_time,'SPY'] > 30):
-                        if holding < 100:
-                            trade_orders.loc[current_time, sym] = 100
-                            holding += 100
-                elif (sma_ratio.loc[current_time,sym] > 1.05) and (bb_value.loc[current_time, sym] > 1)\
-                     and (rsi.loc[current_time,sym] > 70) and (rsi.loc[current_time,'SPY'] < 70):
-                        if holding > -100:
-                            trade_orders.loc[current_time, sym] = -100
-                            holding += -100
-                elif (sma_ratio.loc[prev_time,sym] < 1 ) and (sma_ratio.loc[current_time,sym] >= 1) and (holding > 0):
+                if (sma_ratio.loc[current_time, sym] < 0.95) and (bb_value.loc[current_time, sym] < 0)\
+                        and (rsi.loc[current_time, sym] < 30) and (rsi.loc[current_time, 'SPY'] > 30):
+                    if holding < 100:
+                        trade_orders.loc[current_time, sym] = 100
+                        holding += 100
+                elif (sma_ratio.loc[current_time, sym] > 1.05) and (bb_value.loc[current_time, sym] > 1)\
+                        and (rsi.loc[current_time, sym] > 70) and (rsi.loc[current_time, 'SPY'] < 70):
+                    if holding > -100:
+                        trade_orders.loc[current_time, sym] = -100
+                        holding += -100
+                elif (sma_ratio.loc[prev_time, sym] < 1) and (sma_ratio.loc[current_time, sym] >= 1) and (holding > 0):
                     trade_orders.loc[current_time, sym] = -100
                     holding += -100
-                elif (sma_ratio.loc[prev_time,sym] > 1 ) and (sma_ratio.loc[current_time,sym] <= 1) and (holding < 0):
+                elif (sma_ratio.loc[prev_time, sym] > 1) and (sma_ratio.loc[current_time, sym] <= 1) and (holding < 0):
                     trade_orders.loc[current_time, sym] = 100
                     holding += 100
             count += 1
